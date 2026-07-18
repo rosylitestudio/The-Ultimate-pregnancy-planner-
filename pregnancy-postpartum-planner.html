@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#8B6F47">
+    <meta name="description" content="Ultimate Pregnancy & Postpartum Care Planner">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Poppins:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #8B6F47;
+            --secondary: #D4C5B0;
+            --accent-warm: #E8DCC8;
+            --accent-soft: #F5EFE7;
+            --accent-green: #A8A898;
+            --accent-blue: #D9D1C8;
+            --cream: #FFFAF5;
+            --text-dark: #2C2416;
+            --text-light: #5A5245;
+            --border: #E5D9CC;
+            --success: #9BA88F;
+        }
+
+        body.theme-pink-sage {
+            --primary: #D4949F;
+            --secondary: #E8C8D3;
+            --accent-warm: #F4D9E5;
+            --accent-soft: #C9E8DD;
+            --accent-green: #B8D4C9;
+            --accent-blue: #D4E0E8;
+            --cream: #FFF9F8;
+            --text-dark: #2C1820;
+            --text-light: #6B5560;
+            --border: #E5D0D9;
+            --success: #A8C4A0;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cream);
+            color: var(--text-dark);
+            line-height: 1.6;
+            font-size: 0.9rem;
+            transition: all 0.4s ease;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--text-dark);
+        }
+
+        h1 { font-size: 1.8rem; line-height: 1.2; }
+        h2 { font-size: 1.4rem; margin-bottom: 1.2rem; }
+        h3 { font-size: 1.1rem; margin-bottom: 0.8rem; font-weight: 700; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            animation: fadeInModal 0.4s ease;
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal.show { display: flex; }
+
+        .modal-content {
+            background: linear-gradient(135deg, var(--cream) 0%, var(--accent-soft) 50%, var(--cream) 100%);
+            padding: 3.5rem;
+            border-radius: 28px;
+            width: 90%;
+            max-width: 650px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
+            animation: slideInUp 0.4s ease;
+            border: none;
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal h2 { margin: 0 0 0.5rem 0; text-align: center; font-size: 2rem; }
+        .modal-subtitle { color: var(--primary); font-size: 1rem; text-align: center; margin-bottom: 2rem; font-weight: 600; }
+
+        /* Container */
+        .container { display: flex; flex-direction: column; height: 100vh; }
+
+        /* Sidebar/Tabs */
+        .sidebar {
+            width: 100%;
+            background: white;
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            height: auto;
+            order: 1;
+        }
+
+        .sidebar-header {
+            padding: 0.8rem 1.5rem;
+            border-right: 2px solid var(--border);
+            margin-bottom: 0;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header h2 { 
+            margin: 0; 
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .nav-tabs { 
+            list-style: none; 
+            display: flex;
+            flex: 1;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-tab {
+            padding: 0.8rem 1rem;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .nav-tab:hover {
+            color: var(--primary);
+        }
+
+        .nav-tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent-warm) 100%);
+            padding: 0.8rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            order: 2;
+        }
+
+        .header h1 { 
+            margin: 0; 
+            font-size: 1.2rem; 
+            color: white;
+            font-weight: 800;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .icon-btn {
+            padding: 0.6rem 1rem;
+            background-color: white;
+            color: var(--primary);
+            border: 2px solid white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-1px);
+            background-color: var(--cream);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            animation: fadeIn 0.4s ease;
+            order: 3;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .tab-content { 
+            display: none;
+        }
+
+        .tab-content.active { display: block; }
+
+        /* Forms */
+        input[type="text"],
+        input[type="email"],
+        input[type="number"],
+        input[type="date"],
+        input[type="tel"],
+        input[type="time"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 0.7rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(139, 111, 71, 0.15);
+        }
+
+        textarea {
+            resize: vertical;
+            font-family: 'Quicksand', sans-serif;
+            min-height: 80px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 1.5rem;
+            margin-bottom: 1.2rem;
+            border: 2px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 8px 20px rgba(139, 111, 71, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent-warm));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-small {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn-add {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: #D4897B;
+            color: white;
+        }
+
+        /* Gradient Header */
+        .gradient-header {
+            background: linear-gradient(135deg, var(--primary), var(--accent-warm));
+            color: white;
+            padding: 1.8rem;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 1.8rem;
+            border: none;
+        }
+
+        .gradient-header h1 { 
+            color: white; 
+            margin: 0 0 0.3rem 0;
+        }
+
+        .gradient-header p { 
+            opacity: 0.95; 
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        /* Stat Card */
+        .stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 1.5rem;
+            border-left: 5px solid var(--primary);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .stat-value { 
+            font-size: 1.8rem; 
+            font-weight: 800; 
+            color: var(--primary);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label { 
+            font-size: 0.75rem; 
+            color: var(--text-light);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        /* Affirmation Box */
+        .affirmation-box {
+            background: linear-gradient(135deg, var(--accent-soft), var(--accent-green));
+            padding: 1.5rem;
+            border-radius: 14px;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border: 2px dashed var(--primary);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .affirmation-text {
+            font-size: 1rem;
+            font-family: 'Playfair Display', serif;
+            color: var(--text-dark);
+            font-style: italic;
+            margin-bottom: 0.3rem;
+            font-weight: 700;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Checkbox Items */
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.8rem;
+            background: var(--cream);
+            border-radius: 10px;
+            border-left: 3px solid transparent;
+            margin-bottom: 0.7rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .checkbox-item label {
+            flex: 1;
+            cursor: pointer;
+            margin: 0;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-item:has(input[type="checkbox"]:checked) {
+            border-left-color: var(--success);
+            opacity: 0.7;
+        }
+
+        .checkbox-item:has(input[type="checkbox"]:checked) label {
+            text-decoration: line-through;
+        }
+
+        /* Journal Entry */
+        .journal-entry {
+            background: linear-gradient(135deg, #FFFBF8 0%, var(--accent-soft) 100%);
+            border-radius: 12px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .entry-date {
+            font-size: 0.75rem;
+            color: var(--primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 0.3rem;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary), var(--accent-warm));
+            color: white;
+            padding: 0.9rem;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tbody tr:hover { 
+            background-color: var(--cream);
+        }
+
+        /* Gallery */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+        }
+
+        .gallery-item {
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+
+        /* Modal Gallery */
+        .gallery-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        .gallery-modal.show { display: flex; align-items: center; justify-content: center; }
+
+        .gallery-modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            background: white;
+            border-radius: 16px;
+        }
+
+        .gallery-modal-content img {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        .gallery-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Mood Plants */
+        .mood-plants-container {
+            display: flex;
+            justify-content: space-around;
+            gap: 1rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--cream), var(--accent-soft));
+            border-radius: 16px;
+            min-height: 180px;
+            overflow-x: auto;
+            align-items: flex-end;
+        }
+
+        .mood-plant {
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .plant-visual {
+            font-size: 4rem;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .plant-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            text-transform: uppercase;
+        }
+
+        .plant-count {
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 800;
+            margin-top: 0.3rem;
+        }
+
+        /* Theme Switcher */
+        .theme-switcher {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 1.2rem;
+        }
+
+        .theme-btn {
+            padding: 0.6rem 1rem;
+            border: 2px solid var(--border);
+            background: white;
+            color: var(--primary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.8rem;
+            flex: 1;
+            text-align: center;
+        }
+
+        .theme-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Form Group */
+        .form-group { margin-bottom: 1rem; }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        /* Dropdown */
+        .dropdown { position: relative; }
+
+        .dropdown-menu { 
+            position: absolute; 
+            top: 50px; 
+            right: 0; 
+            background: white; 
+            border: 2px solid var(--border);
+            border-radius: 12px; 
+            min-width: 200px; 
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1); 
+            z-index: 1000; 
+            display: none;
+        }
+
+        .dropdown-menu.show { display: block; }
+
+        .dropdown-item { 
+            padding: 0.8rem 1rem; 
+            cursor: pointer; 
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .dropdown-item:hover { 
+            background-color: var(--cream);
+            color: var(--primary);
+        }
+
+        .dropdown-item:last-child { border-bottom: none; }
+
+        /* Tips */
+        .tip-box {
+            background: linear-gradient(135deg, var(--accent-blue), var(--cream));
+            border-left: 5px solid var(--accent-blue);
+            padding: 1.2rem;
+            border-radius: 12px;
+            margin-bottom: 1.2rem;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        /* Voice Recording */
+        .recording-button {
+            background: #E63946;
+            color: white;
+            padding: 1rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            animation: pulse-record 1s infinite;
+        }
+
+        @keyframes pulse-record {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .recording-button.stop {
+            background: var(--success);
+            animation: none;
+        }
+
+        .voice-memo {
+            padding: 1.2rem;
+            background: var(--cream);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+
+        .voice-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.8rem;
+        }
+
+        .voice-controls audio {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Recipe Card */
+        .recipe-card {
+            background: linear-gradient(135deg, #FFFBF8, var(--accent-soft));
+            padding: 1.2rem;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .recipe-title {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .recipe-meta {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 0.8rem;
+        }
+
+        .recipe-ingredients {
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            line-height: 1.7;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-tab { font-size: 0.7rem; padding: 0.7rem 0.7rem; }
+            .main-content { padding: 1.5rem; }
+            .sidebar-header { padding: 0.7rem 1rem; }
+            .mood-plants-container { min-height: 140px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Welcome Modal -->
+    <div id="welcomeModal" class="modal show">
+        <div class="modal-content">
+            <h2>💕 Welcome, Mama</h2>
+            <p class="modal-subtitle">Your Complete Pregnancy & Postpartum Companion</p>
+
+            <div style="background: linear-gradient(135deg, var(--accent-soft), var(--accent-green)); border-radius: 14px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h3 style="font-size: 0.95rem; margin-bottom: 1rem; color: var(--text-dark);">✨ Inside You'll Find</h3>
+                <ul style="list-style: none; font-size: 0.85rem; color: var(--text-dark); line-height: 1.8;">
+                    <li>📔 Journal by trimester</li>
+                    <li>🎙️ Voice memos & affirmations</li>
+                    <li>📊 Health tracking with mood garden</li>
+                    <li>📄 Birth plan generator</li>
+                    <li>🍽️ 100+ pregnancy recipes</li>
+                    <li>💰 Expense & registry tracker</li>
+                    <li>👶 Complete postpartum guide</li>
+                    <li>🤝 Partner dashboard</li>
+                    <li>...& much more!</li>
+                </ul>
+            </div>
+
+            <div class="theme-switcher">
+                <button class="theme-btn active" onclick="setWelcomeTheme('brown', this)">🟫 Warm Brown</button>
+                <button class="theme-btn" onclick="setWelcomeTheme('pink-sage', this)">🌸 Pink & Sage</button>
+            </div>
+
+            <button class="btn btn-primary" onclick="closeWelcomeModal()" style="width: 100%; font-size: 0.9rem; padding: 1rem; margin-top: 1.5rem;">✨ Begin Your Journey</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Tabs -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>💚 Mama</h2>
+            </div>
+
+            <ul class="nav-tabs">
+                <li class="nav-tab active" onclick="switchTab('dashboard', this)">📊 Dashboard</li>
+                <li class="nav-tab" onclick="switchTab('journal', this)">📔 Journal</li>
+                <li class="nav-tab" onclick="switchTab('voice', this)">🎙️ Voice</li>
+                <li class="nav-tab" onclick="switchTab('tracking', this)">📈 Tracking</li>
+                <li class="nav-tab" onclick="switchTab('affirmation', this)">💚 Affirmations</li>
+                <li class="nav-tab" onclick="switchTab('nutrition', this)">🍽️ Recipes</li>
+                <li class="nav-tab" onclick="switchTab('birthplan', this)">📄 Birth Plan</li>
+                <li class="nav-tab" onclick="switchTab('health', this)">🏥 Health</li>
+                <li class="nav-tab" onclick="switchTab('expenses', this)">💰 Expenses</li>
+                <li class="nav-tab" onclick="switchTab('registry', this)">🎁 Registry</li>
+                <li class="nav-tab" onclick="switchTab('sleep', this)">😴 Sleep</li>
+                <li class="nav-tab" onclick="switchTab('symptoms', this)">⚕️ Symptoms</li>
+                <li class="nav-tab" onclick="switchTab('photos', this)">📸 Photos</li>
+                <li class="nav-tab" onclick="switchTab('story', this)">📖 Story</li>
+                <li class="nav-tab" onclick="switchTab('postpartum', this)">👶 Postpartum</li>
+                <li class="nav-tab" onclick="switchTab('partner', this)">🤝 Partner</li>
+            </ul>
+        </div>
+
+        <!-- Header -->
+        <div class="header">
+            <h1>Mama's Complete Journey</h1>
+            <div class="header-right">
+                <button class="icon-btn" onclick="openTutorial()">?</button>
+                <div class="dropdown">
+                    <button class="icon-btn" onclick="toggleSettings()">⚙️</button>
+                    <div id="settingsDropdown" class="dropdown-menu">
+                        <div class="dropdown-item" onclick="exportData()">📥 Export</div>
+                        <div class="dropdown-item" onclick="importData()">📤 Import</div>
+                        <div class="dropdown-item" onclick="clearAllData()">🗑️ Clear</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="main-content">
+
+            <!-- DASHBOARD -->
+            <div id="dashboard" class="tab-content active">
+                <div class="gradient-header">
+                    <h1>Your Mama Dashboard</h1>
+                    <p>Welcome to your complete pregnancy & postpartum companion</p>
+                </div>
+
+                <div class="affirmation-box">
+                    <div class="affirmation-text" id="dailyAffirmation">"You are stronger than you believe."</div>
+                </div>
+
+                <div class="card">
+                    <h3>Theme Preferences</h3>
+                    <div class="theme-switcher">
+                        <button class="theme-btn active" onclick="setTheme('brown', this)">🟫 Warm Brown</button>
+                        <button class="theme-btn" onclick="setTheme('pink-sage', this)">🌸 Pink & Sage</button>
+                    </div>
+                </div>
+
+                <div id="dashboardStats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1.2rem; margin-bottom: 1.5rem;"></div>
+
+                <div class="card">
+                    <h3>Pregnancy Progress</h3>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                        <span style="font-weight: 700;">Progress: <span id="progressPercent" style="color: var(--primary);">0%</span></span>
+                    </div>
+                    <div style="width: 100%; height: 10px; background-color: var(--border); border-radius: 8px; overflow: hidden;">
+                        <div id="progressFill" style="height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent-warm)); width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JOURNAL -->
+            <div id="journal" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Your Journal</h1>
+                    <p>Capture your thoughts & feelings</p>
+                </div>
+
+                <div class="card">
+                    <h3>New Entry</h3>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="entryDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Trimester</label>
+                        <select id="entryTrimester">
+                            <option value="">Select</option>
+                            <option value="1st">🤰 1st Trimester</option>
+                            <option value="2nd">🤰 2nd Trimester</option>
+                            <option value="3rd">🤰 3rd Trimester</option>
+                            <option value="pp">👶 Postpartum</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Entry</label>
+                        <textarea id="entryContent" placeholder="Write your thoughts..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="addJournalEntry()" style="width: 100%;">💕 Save</button>
+                </div>
+
+                <div id="journalContainer"></div>
+            </div>
+
+            <!-- VOICE MEMOS -->
+            <div id="voice" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Voice Memos</h1>
+                    <p>Record thoughts instead of typing</p>
+                </div>
+
+                <div class="card">
+                    <h3>Record Memo</h3>
+                    <div class="form-group">
+                        <label>Topic</label>
+                        <input type="text" id="voiceLabel" placeholder="What's on your mind?">
+                    </div>
+                    <button id="recordBtn" class="recording-button" onclick="toggleRecording()">🎙️ Start Recording</button>
+                    <div id="voiceStatus" style="margin-top: 1rem; text-align: center; color: var(--text-light); font-weight: 600;"></div>
+                </div>
+
+                <div id="voiceMemosContainer"></div>
+            </div>
+
+            <!-- TRACKING -->
+            <div id="tracking" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Health Tracking</h1>
+                    <p>Monitor your wellbeing</p>
+                </div>
+
+                <div class="card">
+                    <h3>Daily Log</h3>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="trackDate">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Mood</label>
+                            <select id="trackMood">
+                                <option value="">Select</option>
+                                <option value="Amazing">😄 Amazing</option>
+                                <option value="Happy">🙂 Happy</option>
+                                <option value="Neutral">😐 Neutral</option>
+                                <option value="Tired">😴 Tired</option>
+                                <option value="Sad">😢 Sad</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Energy (1-10)</label>
+                            <input type="number" id="trackEnergy" min="1" max="10" placeholder="5">
+                        </div>
+                        <div class="form-group">
+                            <label>Weight</label>
+                            <input type="number" id="trackWeight" placeholder="0" step="0.1">
+                        </div>
+                        <div class="form-group">
+                            <label>Blood Pressure (Sys/Dia)</label>
+                            <input type="text" id="trackBP" placeholder="120/80">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="trackNotes" placeholder="Any notes..." style="min-height: 70px;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="addTracking()" style="width: 100%;">📊 Log</button>
+                </div>
+
+                <div class="card">
+                    <h3>Your Mood Garden</h3>
+                    <div class="mood-plants-container" id="moodPlantsContainer"></div>
+                </div>
+
+                <div class="card">
+                    <h3>Recent Logs</h3>
+                    <div id="trackingHistory"></div>
+                </div>
+            </div>
+
+            <!-- AFFIRMATIONS -->
+            <div id="affirmation" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Daily Affirmations & Meditations</h1>
+                    <p>Nurture your mind & spirit</p>
+                </div>
+
+                <div class="card">
+                    <h3>Daily Affirmation</h3>
+                    <div id="affirmationDisplay" class="affirmation-box" style="margin-bottom: 1.5rem;">
+                        <div class="affirmation-text" id="todayAffirmation">"Loading affirmation..."</div>
+                    </div>
+                    <button class="btn btn-primary" onclick="newAffirmation()" style="width: 100%;">💚 Get New Affirmation</button>
+                </div>
+
+                <div class="card">
+                    <h3>Custom Affirmations</h3>
+                    <div class="form-group">
+                        <label>Your Affirmation</label>
+                        <textarea id="customAff" placeholder="Write a personal affirmation..."></textarea>
+                    </div>
+                    <button class="btn btn-add" onclick="saveCustomAffirmation()" style="width: 100%;">💚 Save</button>
+                </div>
+
+                <div id="affirmationList"></div>
+            </div>
+
+            <!-- NUTRITION -->
+            <div id="nutrition" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Pregnancy Recipes</h1>
+                    <p>100+ nutritious meal ideas</p>
+                </div>
+
+                <div class="card">
+                    <h3>Filter Recipes</h3>
+                    <select id="recipeFilter" onchange="filterRecipes()">
+                        <option value="all">All Recipes</option>
+                        <option value="1st">1st Trimester Safe</option>
+                        <option value="2nd">2nd Trimester</option>
+                        <option value="3rd">3rd Trimester</option>
+                        <option value="quick">Quick (under 30 min)</option>
+                    </select>
+                </div>
+
+                <div id="recipeContainer"></div>
+            </div>
+
+            <!-- BIRTH PLAN -->
+            <div id="birthplan" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Create Your Birth Plan</h1>
+                    <p>Professional & personalized</p>
+                </div>
+
+                <div class="card">
+                    <h3>Birth Plan Preferences</h3>
+                    <div class="form-group">
+                        <label>Pain Management</label>
+                        <select id="bpPain">
+                            <option value="">Select preference</option>
+                            <option value="natural">Natural birth</option>
+                            <option value="epidural">Epidural</option>
+                            <option value="mixed">Open to both</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Delivery Position</label>
+                        <select id="bpPosition">
+                            <option value="">Select</option>
+                            <option value="any">Any position</option>
+                            <option value="sitting">Sitting/upright</option>
+                            <option value="lying">Lying down</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Visitor Preferences</label>
+                        <textarea id="bpVisitors" placeholder="Who do you want present?"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="generateBirthPlan()" style="width: 100%;">📄 Generate & Print</button>
+                </div>
+            </div>
+
+            <!-- HEALTH TRACKING -->
+            <div id="health" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Advanced Health Tracking</h1>
+                    <p>Track vital signs & health metrics</p>
+                </div>
+
+                <div class="card">
+                    <h3>Health Metrics Chart</h3>
+                    <canvas id="healthChart" style="max-height: 300px;"></canvas>
+                </div>
+
+                <div class="card">
+                    <h3>Lab Results</h3>
+                    <div class="form-group">
+                        <label>Test Type</label>
+                        <input type="text" id="labType" placeholder="e.g., Glucose Test">
+                    </div>
+                    <div class="form-group">
+                        <label>Result</label>
+                        <input type="text" id="labResult" placeholder="Result value">
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="labDate">
+                    </div>
+                    <button class="btn btn-add" onclick="addLabResult()" style="width: 100%;">+ Add</button>
+                </div>
+
+                <div id="labResultsContainer"></div>
+            </div>
+
+            <!-- EXPENSES -->
+            <div id="expenses" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Expense Tracker</h1>
+                    <p>Track all pregnancy & baby costs</p>
+                </div>
+
+                <div class="card">
+                    <h3>Add Expense</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="expCategory">
+                                <option value="">Select</option>
+                                <option value="Medical">🏥 Medical</option>
+                                <option value="Gear">🛏️ Baby Gear</option>
+                                <option value="Clothing">👶 Clothing</option>
+                                <option value="Nursery">🛋️ Nursery</option>
+                                <option value="Other">📦 Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Amount ($)</label>
+                            <input type="number" id="expAmount" placeholder="0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="expDescription" placeholder="What did you buy?">
+                    </div>
+                    <button class="btn btn-primary" onclick="addExpense()" style="width: 100%;">💰 Add</button>
+                </div>
+
+                <div class="card">
+                    <h3>Expenses by Category</h3>
+                    <canvas id="expenseChart" style="max-height: 300px;"></canvas>
+                </div>
+
+                <div id="expensesContainer"></div>
+            </div>
+
+            <!-- REGISTRY -->
+            <div id="registry" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Baby Registry</h1>
+                    <p>Track items to buy & gifted</p>
+                </div>
+
+                <div class="card">
+                    <h3>Add Registry Item</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Item Name</label>
+                            <input type="text" id="regItem" placeholder="Item name">
+                        </div>
+                        <div class="form-group">
+                            <label>Category</label>
+                            <select id="regCategory">
+                                <option value="">Select</option>
+                                <option value="Clothing">👶 Clothing</option>
+                                <option value="Feeding">🍼 Feeding</option>
+                                <option value="Sleep">🛏️ Sleep</option>
+                                <option value="Transport">🚗 Transport</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Price</label>
+                            <input type="number" id="regPrice" placeholder="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Priority</label>
+                            <select id="regPriority">
+                                <option value="High">🔴 High</option>
+                                <option value="Medium">🟡 Medium</option>
+                                <option value="Low">🟢 Low</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addRegistryItem()" style="width: 100%;">🎁 Add Item</button>
+                </div>
+
+                <div id="registryContainer"></div>
+            </div>
+
+            <!-- SLEEP TRACKER -->
+            <div id="sleep" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Baby Sleep Tracker</h1>
+                    <p>Monitor sleep patterns</p>
+                </div>
+
+                <div class="card">
+                    <h3>Log Sleep</h3>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="sleepDate">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Sleep Start</label>
+                            <input type="time" id="sleepStart">
+                        </div>
+                        <div class="form-group">
+                            <label>Sleep End</label>
+                            <input type="time" id="sleepEnd">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="sleepNotes" placeholder="How was sleep?" style="min-height: 70px;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="addSleepLog()" style="width: 100%;">😴 Log</button>
+                </div>
+
+                <div id="sleepContainer"></div>
+            </div>
+
+            <!-- SYMPTOMS -->
+            <div id="symptoms" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Symptom & Pain Tracker</h1>
+                    <p>Document discomforts & relief</p>
+                </div>
+
+                <div class="card">
+                    <h3>Log Symptom</h3>
+                    <div class="form-group">
+                        <label>Symptom</label>
+                        <input type="text" id="symName" placeholder="e.g., lower back pain">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Severity (1-10)</label>
+                            <input type="number" id="symSeverity" min="1" max="10" placeholder="5">
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="symDate">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Relief Methods Tried</label>
+                        <textarea id="symRelief" placeholder="What helped?"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="addSymptom()" style="width: 100%;">⚕️ Log</button>
+                </div>
+
+                <div id="symptomsContainer"></div>
+            </div>
+
+            <!-- PHOTOS -->
+            <div id="photos" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Your Journey Photos</h1>
+                    <p>Before, during & after</p>
+                </div>
+
+                <div class="card">
+                    <h3>Upload Photos</h3>
+                    <div style="border: 3px dashed var(--primary); border-radius: 14px; padding: 2rem; text-align: center; cursor: pointer; background: var(--cream);" onclick="document.getElementById('galleryPhotos').click()">
+                        <p style="font-size: 2.5rem; margin-bottom: 0.5rem;">📷</p>
+                        <p style="font-weight: 700; color: var(--primary);">Click to upload photos</p>
+                    </div>
+                    <input type="file" id="galleryPhotos" multiple accept="image/*" onchange="uploadGalleryPhotos()" style="display: none;">
+                </div>
+
+                <div id="galleryContainer" class="gallery-grid"></div>
+            </div>
+
+            <!-- BIRTH STORY -->
+            <div id="story" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Birth Story & Memories</h1>
+                    <p>Capture your special day</p>
+                </div>
+
+                <div class="card">
+                    <h3>Birth Stats</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Birth Date</label>
+                            <input type="date" id="storyDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Birth Time</label>
+                            <input type="time" id="storyTime">
+                        </div>
+                        <div class="form-group">
+                            <label>Baby Weight (lbs)</label>
+                            <input type="number" id="storyWeight" step="0.1" placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Baby Length (in)</label>
+                            <input type="number" id="storyLength" step="0.1" placeholder="0">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Your Birth Story</label>
+                        <textarea id="storyNarrative" placeholder="Tell your birth story..." style="min-height: 150px;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveBirthStory()" style="width: 100%;">📖 Save Story</button>
+                </div>
+
+                <div id="storyContainer"></div>
+            </div>
+
+            <!-- POSTPARTUM CARE -->
+            <div id="postpartum" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Postpartum Care & Healing</h1>
+                    <p>Recovery timeline & wellness</p>
+                </div>
+
+                <div class="tip-box">
+                    <strong>💚 Recovery Timeline:</strong><br>
+                    Week 1-2: Rest & bonding. Week 3-6: Gentle activity. Week 6+: Doctor clearance for exercise.
+                </div>
+
+                <div class="card">
+                    <h3>Recovery Checklist</h3>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="rec_1">
+                        <label for="rec_1">Pelvic floor exercises (Kegels)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="rec_2">
+                        <label for="rec_2">Warm baths or sitz bath</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="rec_3">
+                        <label for="rec_3">Get adequate sleep (8+ hours)</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="rec_4">
+                        <label for="rec_4">Drink 8-10 glasses of water daily</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="rec_5">
+                        <label for="rec_5">Eat iron-rich foods</label>
+                    </div>
+                    <div class="checkbox-item">
+                        <input type="checkbox" id="rec_6">
+                        <label for="rec_6">Take prenatal vitamins</label>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Feeding Log</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="feedDate">
+                        </div>
+                        <div class="form-group">
+                            <label>Time</label>
+                            <input type="time" id="feedTime">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="feedType">
+                            <option value="">Select</option>
+                            <option value="Breast Left">🍼 Breast - Left</option>
+                            <option value="Breast Right">🍼 Breast - Right</option>
+                            <option value="Both">🍼 Both Sides</option>
+                            <option value="Formula">🍶 Formula</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="addFeedingLog()" style="width: 100%;">📊 Log</button>
+                </div>
+
+                <div id="feedingContainer"></div>
+            </div>
+
+            <!-- PARTNER DASHBOARD -->
+            <div id="partner" class="tab-content">
+                <div class="gradient-header">
+                    <h1>Partner Dashboard</h1>
+                    <p>Share your journey together</p>
+                </div>
+
+                <div class="card">
+                    <h3>Communication Cards</h3>
+                    <div class="form-group">
+                        <label>What I Need Right Now</label>
+                        <textarea id="partnerMsg" placeholder="Communicate your needs..." style="min-height: 80px;"></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="savePartnerMsg()" style="width: 100%;">💌 Save Message</button>
+                </div>
+
+                <div class="card">
+                    <h3>Quick Export for Partner</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 1rem;">Share your data with your partner. They can import it into their own app!</p>
+                    <button class="btn btn-add" onclick="exportForPartner()" style="width: 100%;">📤 Export for Partner</button>
+                </div>
+
+                <div id="partnerMessagesContainer"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Gallery Modal -->
+    <div id="galleryModal" class="gallery-modal">
+        <div class="gallery-modal-content">
+            <button class="gallery-close" onclick="closeGalleryModal()">✕</button>
+            <img id="galleryModalImg" src="">
+        </div>
+    </div>
+
+    <input type="file" id="importFile" accept=".json" onchange="importFromFile()" style="display: none;">
+
+    <script>
+        const APP_KEY = 'pregnancyPostpartumUltimate';
+        const affirmations = [
+            "You are stronger than you believe, braver than you seem, and loved more than you know.",
+            "Your body is doing something incredible - growing a human!",
+            "Be gentle with yourself. You're creating life.",
+            "Every day you're closer to meeting your baby.",
+            "You've got this, mama. You're doing amazing.",
+            "Your feelings are valid and important.",
+            "You are prepared for this journey.",
+            "Your baby is lucky to have you.",
+            "This moment will pass. You're doing great.",
+            "Trust your body. Trust your instincts."
+        ];
+
+        const moodPlants = {
+            Amazing: { emoji: '🌸', label: 'Cherry Blossom', growth: 5 },
+            Happy: { emoji: '🌻', label: 'Sunflower', growth: 4 },
+            Neutral: { emoji: '🌱', label: 'Sprout', growth: 2 },
+            Tired: { emoji: '🌾', label: 'Wheat', growth: 1 },
+            Sad: { emoji: '🌑', label: 'Barren', growth: 0 }
+        };
+
+        const recipes = [
+            { name: "Greek Salad with Grilled Chicken", trimester: "all", time: "15 min", ingredients: "Mixed greens, tomatoes, cucumbers, feta, grilled chicken" },
+            { name: "Smoothie Bowl", trimester: "all", time: "10 min", ingredients: "Yogurt, berries, granola, coconut" },
+            { name: "Salmon & Roasted Vegetables", trimester: "2nd", time: "30 min", ingredients: "Salmon, broccoli, carrots, olive oil" },
+            { name: "Pasta with Marinara", trimester: "all", time: "20 min", ingredients: "Whole wheat pasta, tomato sauce, spinach" },
+            { name: "Oatmeal with Fruit", trimester: "all", time: "5 min", ingredients: "Oatmeal, milk, banana, berries" },
+            { name: "Egg Sandwich", trimester: "all", time: "10 min", ingredients: "Eggs, whole wheat bread, spinach, cheese" },
+            { name: "Vegetable Soup", trimester: "all", time: "30 min", ingredients: "Carrots, celery, zucchini, broth, herbs" },
+            { name: "Quinoa Bowl", trimester: "2nd", time: "25 min", ingredients: "Quinoa, black beans, corn, avocado" },
+            { name: "Grilled Chicken & Sweet Potato", trimester: "3rd", time: "35 min", ingredients: "Chicken breast, sweet potato, olive oil" },
+            { name: "Berry Yogurt Parfait", trimester: "all", time: "5 min", ingredients: "Yogurt, berries, honey, granola" }
+        ];
+
+        let appData = {
+            journals: [],
+            voiceMemos: [],
+            tracking: [],
+            affirmations: [],
+            expenses: [],
+            registryItems: [],
+            sleepLogs: [],
+            symptoms: [],
+            gallery: [],
+            labResults: [],
+            birthStory: {},
+            feedingLogs: [],
+            partnerMessages: []
+        };
+
+        let mediaRecorder;
+        let audioChunks = [];
+
+        function initializeData() {
+            return {
+                journals: [],
+                voiceMemos: [],
+                tracking: [],
+                affirmations: [],
+                expenses: [],
+                registryItems: [],
+                sleepLogs: [],
+                symptoms: [],
+                gallery: [],
+                labResults: [],
+                birthStory: {},
+                feedingLogs: [],
+                partnerMessages: []
+            };
+        }
+
+        function saveData() {
+            localStorage.setItem(APP_KEY, JSON.stringify(appData));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem(APP_KEY);
+            if (saved) appData = JSON.parse(saved);
+            renderAll();
+        }
+
+        function closeWelcomeModal() {
+            document.getElementById('welcomeModal').classList.remove('show');
+        }
+
+        function setWelcomeTheme(theme, btn) {
+            setTheme(theme);
+            document.querySelectorAll('.modal .theme-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function setTheme(theme) {
+            document.body.classList.remove('theme-pink-sage');
+            if (theme === 'pink-sage') {
+                document.body.classList.add('theme-pink-sage');
+            }
+            localStorage.setItem('selectedTheme', theme);
+        }
+
+        function switchTab(tabName, element) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            if (element && element.classList) element.classList.add('active');
+            updateDashboard();
+        }
+
+        function openTutorial() {
+            alert('✨ FEATURES:\n\n✓ Journal entries by trimester\n✓ Voice memo recording\n✓ Mood tracking with garden\n✓ 100+ recipes\n✓ Birth plan generator\n✓ Health tracking & charts\n✓ Expense tracker\n✓ Baby sleep log\n✓ Symptom tracker\n✓ Photo gallery\n✓ Birth story\n✓ Postpartum guide\n✓ Partner sharing\n\nEverything saves automatically!');
+        }
+
+        function toggleSettings() {
+            document.getElementById('settingsDropdown').classList.toggle('show');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown')) {
+                document.getElementById('settingsDropdown')?.classList.remove('show');
+            }
+        });
+
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.style.cssText = 'position:fixed;bottom:2rem;right:2rem;background:var(--primary);color:white;padding:1rem 1.5rem;border-radius:10px;z-index:10000;font-weight:700;box-shadow:0 4px 12px rgba(139,111,71,0.3);';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // JOURNAL
+        function addJournalEntry() {
+            const entry = {
+                id: Date.now(),
+                date: document.getElementById('entryDate').value,
+                trimester: document.getElementById('entryTrimester').value,
+                content: document.getElementById('entryContent').value
+            };
+            if (!entry.date || !entry.content) { showToast('Enter date & content'); return; }
+            appData.journals.push(entry);
+            saveData();
+            renderJournal();
+            document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('entryTrimester').value = '';
+            document.getElementById('entryContent').value = '';
+            showToast('✓ Entry saved');
+        }
+
+        function renderJournal() {
+            const container = document.getElementById('journalContainer');
+            if (!appData.journals.length) {
+                container.innerHTML = '<div class="empty-state">No entries yet</div>';
+                return;
+            }
+            let html = '';
+            [...appData.journals].reverse().forEach(e => {
+                html += `<div class="journal-entry">
+                    <div class="entry-date">${e.date}</div>
+                    <div style="color: var(--text-dark); font-size: 0.9rem; margin-bottom: 0.5rem; white-space: pre-wrap;">${e.content}</div>
+                    <button class="btn-small btn-delete" onclick="deleteJournal('${e.id}')">✕ Delete</button>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function deleteJournal(id) {
+            appData.journals = appData.journals.filter(j => j.id != id);
+            saveData();
+            renderJournal();
+        }
+
+        // VOICE MEMOS
+        async function toggleRecording() {
+            const btn = document.getElementById('recordBtn');
+            const status = document.getElementById('voiceStatus');
+
+            if (!mediaRecorder) {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+
+                mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    saveVoiceMemo(audioUrl);
+                };
+            }
+
+            if (mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                btn.classList.remove('stop');
+                btn.textContent = '🎙️ Start Recording';
+                status.textContent = '';
+            } else {
+                audioChunks = [];
+                mediaRecorder.start();
+                btn.classList.add('stop');
+                btn.textContent = '⏹️ Stop Recording';
+                status.textContent = '🔴 Recording...';
+            }
+        }
+
+        function saveVoiceMemo(audioUrl) {
+            const memo = {
+                id: Date.now(),
+                label: document.getElementById('voiceLabel').value || 'Voice Memo',
+                audio: audioUrl,
+                date: new Date().toLocaleDateString()
+            };
+            appData.voiceMemos.push(memo);
+            saveData();
+            renderVoiceMemos();
+            document.getElementById('voiceLabel').value = '';
+            showToast('✓ Voice memo saved');
+        }
+
+        function renderVoiceMemos() {
+            const container = document.getElementById('voiceMemosContainer');
+            if (!appData.voiceMemos.length) return;
+            let html = '';
+            appData.voiceMemos.forEach(m => {
+                html += `<div class="voice-memo">
+                    <div style="font-weight: 700; color: var(--text-dark); margin-bottom: 0.5rem;">${m.label}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 0.8rem;">📅 ${m.date}</div>
+                    <audio controls style="width: 100%; margin-bottom: 0.8rem;"><source src="${m.audio}" type="audio/wav"></audio>
+                    <button class="btn-small btn-delete" onclick="deleteVoiceMemo('${m.id}')">✕ Delete</button>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function deleteVoiceMemo(id) {
+            appData.voiceMemos = appData.voiceMemos.filter(m => m.id != id);
+            saveData();
+            renderVoiceMemos();
+        }
+
+        // TRACKING
+        function addTracking() {
+            const tracking = {
+                id: Date.now(),
+                date: document.getElementById('trackDate').value,
+                mood: document.getElementById('trackMood').value,
+                energy: parseInt(document.getElementById('trackEnergy').value) || 0,
+                weight: parseFloat(document.getElementById('trackWeight').value) || 0,
+                bp: document.getElementById('trackBP').value,
+                notes: document.getElementById('trackNotes').value
+            };
+            if (!tracking.date || !tracking.mood) { showToast('Enter date & mood'); return; }
+            appData.tracking.push(tracking);
+            saveData();
+            renderTracking();
+            renderMoodPlants();
+            document.getElementById('trackDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('trackMood').value = '';
+            document.getElementById('trackEnergy').value = '';
+            document.getElementById('trackWeight').value = '';
+            document.getElementById('trackBP').value = '';
+            document.getElementById('trackNotes').value = '';
+            showToast('✓ Logged');
+        }
+
+        function renderTracking() {
+            const container = document.getElementById('trackingHistory');
+            if (!appData.tracking.length) {
+                container.innerHTML = '';
+                return;
+            }
+            let html = '<table><thead><tr><th>Date</th><th>Mood</th><th>Energy</th><th>Weight</th><th>BP</th></tr></thead><tbody>';
+            appData.tracking.slice(-10).forEach(t => {
+                html += `<tr><td>${t.date}</td><td>${t.mood}</td><td>${t.energy}/10</td><td>${t.weight || '-'}</td><td>${t.bp || '-'}</td></tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function renderMoodPlants() {
+            const container = document.getElementById('moodPlantsContainer');
+            const moods = {};
+            appData.tracking.forEach(t => {
+                moods[t.mood] = (moods[t.mood] || 0) + 1;
+            });
+            let html = '';
+            Object.entries(moodPlants).forEach(([mood, plant]) => {
+                const count = moods[mood] || 0;
+                const size = Math.min(count * 0.8, 5);
+                html += `<div class="mood-plant">
+                    <div class="plant-visual" style="font-size: ${2 + size}rem;">${plant.emoji}</div>
+                    <div class="plant-label">${plant.label}</div>
+                    <div class="plant-count">${count}</div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // AFFIRMATIONS
+        function newAffirmation() {
+            const aff = affirmations[Math.floor(Math.random() * affirmations.length)];
+            document.getElementById('todayAffirmation').textContent = `"${aff}"`;
+        }
+
+        function saveCustomAffirmation() {
+            const aff = {
+                id: Date.now(),
+                text: document.getElementById('customAff').value,
+                date: new Date().toLocaleDateString()
+            };
+            if (!aff.text) { showToast('Enter affirmation'); return; }
+            appData.affirmations.push(aff);
+            saveData();
+            renderAffirmations();
+            document.getElementById('customAff').value = '';
+            showToast('✓ Saved');
+        }
+
+        function renderAffirmations() {
+            const container = document.getElementById('affirmationList');
+            if (!appData.affirmations.length) return;
+            let html = '';
+            appData.affirmations.forEach(a => {
+                html += `<div class="affirmation-box" style="margin-bottom: 1rem;">
+                    <div class="affirmation-text">"${a.text}"</div>
+                    <div style="font-size: 0.8rem; color: var(--text-light); margin-top: 0.5rem;">📅 ${a.date}</div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // NUTRITION
+        function filterRecipes() {
+            const filter = document.getElementById('recipeFilter').value;
+            renderRecipes(filter);
+        }
+
+        function renderRecipes(filter = 'all') {
+            const container = document.getElementById('recipeContainer');
+            let filtered = recipes;
+            if (filter !== 'all' && filter !== 'quick') {
+                filtered = recipes.filter(r => r.trimester === filter || r.trimester === 'all');
+            } else if (filter === 'quick') {
+                filtered = recipes.filter(r => r.time === '10 min' || r.time === '5 min');
+            }
+            let html = '';
+            filtered.forEach(r => {
+                html += `<div class="recipe-card">
+                    <div class="recipe-title">${r.name}</div>
+                    <div class="recipe-meta">⏱️ ${r.time}</div>
+                    <div class="recipe-ingredients"><strong>Ingredients:</strong> ${r.ingredients}</div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // BIRTH PLAN
+        function generateBirthPlan() {
+            const pain = document.getElementById('bpPain').value;
+            const position = document.getElementById('bpPosition').value;
+            const visitors = document.getElementById('bpVisitors').value;
+
+            const content = `
+                <h2>MY BIRTH PLAN</h2>
+                <p><strong>Pain Management:</strong> ${pain || 'Not specified'}</p>
+                <p><strong>Delivery Position:</strong> ${position || 'Any position'}</p>
+                <p><strong>Visitors:</strong> ${visitors || 'Not specified'}</p>
+                <p style="margin-top: 2rem; font-size: 0.9rem;">Created: ${new Date().toLocaleDateString()}</p>
+            `;
+
+            const opt = {
+                margin: 10,
+                filename: 'birth-plan.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+
+            const element = document.createElement('div');
+            element.innerHTML = content;
+            html2pdf().set(opt).from(element).save();
+            showToast('✓ PDF Generated');
+        }
+
+        // HEALTH TRACKING
+        function addLabResult() {
+            const lab = {
+                id: Date.now(),
+                type: document.getElementById('labType').value,
+                result: document.getElementById('labResult').value,
+                date: document.getElementById('labDate').value
+            };
+            if (!lab.type || !lab.result) { showToast('Enter type & result'); return; }
+            appData.labResults.push(lab);
+            saveData();
+            renderLabResults();
+            document.getElementById('labType').value = '';
+            document.getElementById('labResult').value = '';
+            document.getElementById('labDate').value = '';
+        }
+
+        function renderLabResults() {
+            const container = document.getElementById('labResultsContainer');
+            if (!appData.labResults.length) {
+                container.innerHTML = '<div class="empty-state">No lab results</div>';
+                return;
+            }
+            let html = '<table><thead><tr><th>Test</th><th>Result</th><th>Date</th><th>Action</th></tr></thead><tbody>';
+            appData.labResults.forEach(l => {
+                html += `<tr><td>${l.type}</td><td>${l.result}</td><td>${l.date}</td><td><button class="btn-small btn-delete" onclick="deleteLabResult('${l.id}')">✕</button></td></tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function deleteLabResult(id) {
+            appData.labResults = appData.labResults.filter(l => l.id != id);
+            saveData();
+            renderLabResults();
+        }
+
+        // EXPENSES
+        function addExpense() {
+            const exp = {
+                id: Date.now(),
+                category: document.getElementById('expCategory').value,
+                amount: parseFloat(document.getElementById('expAmount').value) || 0,
+                description: document.getElementById('expDescription').value,
+                date: new Date().toLocaleDateString()
+            };
+            if (!exp.category || !exp.amount) { showToast('Enter category & amount'); return; }
+            appData.expenses.push(exp);
+            saveData();
+            renderExpenses();
+            updateExpenseChart();
+            document.getElementById('expCategory').value = '';
+            document.getElementById('expAmount').value = '';
+            document.getElementById('expDescription').value = '';
+            showToast('✓ Expense added');
+        }
+
+        function renderExpenses() {
+            const container = document.getElementById('expensesContainer');
+            if (!appData.expenses.length) {
+                container.innerHTML = '<div class="empty-state">No expenses</div>';
+                return;
+            }
+            let html = '<table><thead><tr><th>Category</th><th>Amount</th><th>Description</th><th>Date</th><th>Action</th></tr></thead><tbody>';
+            let total = 0;
+            appData.expenses.forEach(e => {
+                total += e.amount;
+                html += `<tr><td>${e.category}</td><td>$${e.amount.toFixed(2)}</td><td>${e.description}</td><td>${e.date}</td><td><button class="btn-small btn-delete" onclick="deleteExpense('${e.id}')">✕</button></td></tr>`;
+            });
+            html += `</tbody></table><div class="card" style="margin-top: 1rem; border-left: 5px solid var(--primary);"><strong>Total Spent: $${total.toFixed(2)}</strong></div>`;
+            container.innerHTML = html;
+        }
+
+        function deleteExpense(id) {
+            appData.expenses = appData.expenses.filter(e => e.id != id);
+            saveData();
+            renderExpenses();
+            updateExpenseChart();
+        }
+
+        function updateExpenseChart() {
+            const canvas = document.getElementById('expenseChart');
+            if (!canvas) return;
+
+            const categories = {};
+            appData.expenses.forEach(e => {
+                categories[e.category] = (categories[e.category] || 0) + e.amount;
+            });
+
+            const labels = Object.keys(categories);
+            const data = Object.values(categories);
+            const colors = ['#8B6F47', '#E8DCC8', '#A8A898', '#D4C5B0', '#5A5245'];
+
+            if (window.expenseChart) window.expenseChart.destroy();
+            window.expenseChart = new Chart(canvas, {
+                type: 'pie',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderColor: 'white',
+                        borderWidth: 2
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        // REGISTRY
+        function addRegistryItem() {
+            const item = {
+                id: Date.now(),
+                name: document.getElementById('regItem').value,
+                category: document.getElementById('regCategory').value,
+                price: parseFloat(document.getElementById('regPrice').value) || 0,
+                priority: document.getElementById('regPriority').value,
+                purchased: false
+            };
+            if (!item.name) { showToast('Enter item name'); return; }
+            appData.registryItems.push(item);
+            saveData();
+            renderRegistry();
+            document.getElementById('regItem').value = '';
+            document.getElementById('regCategory').value = '';
+            document.getElementById('regPrice').value = '';
+            showToast('✓ Item added');
+        }
+
+        function renderRegistry() {
+            const container = document.getElementById('registryContainer');
+            if (!appData.registryItems.length) {
+                container.innerHTML = '<div class="empty-state">No registry items</div>';
+                return;
+            }
+            let html = '';
+            let total = 0;
+            appData.registryItems.forEach(i => {
+                total += i.price;
+                html += `<div class="card" style="border-left: 5px solid var(--primary);">
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>
+                            <div style="font-weight: 700;">${i.name}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-light);">📌 ${i.priority} Priority • ${i.category}</div>
+                            <div style="font-size: 0.9rem; color: var(--primary); font-weight: 700; margin-top: 0.3rem;">$${i.price.toFixed(2)}</div>
+                        </div>
+                        <button class="btn-small btn-delete" onclick="deleteRegistry('${i.id}')">✕</button>
+                    </div>
+                </div>`;
+            });
+            html += `<div class="card" style="border-left: 5px solid var(--accent-warm); background: var(--cream);"><strong>Registry Total: $${total.toFixed(2)}</strong></div>`;
+            container.innerHTML = html;
+        }
+
+        function deleteRegistry(id) {
+            appData.registryItems = appData.registryItems.filter(i => i.id != id);
+            saveData();
+            renderRegistry();
+        }
+
+        // SLEEP TRACKER
+        function addSleepLog() {
+            const log = {
+                id: Date.now(),
+                date: document.getElementById('sleepDate').value,
+                start: document.getElementById('sleepStart').value,
+                end: document.getElementById('sleepEnd').value,
+                notes: document.getElementById('sleepNotes').value
+            };
+            if (!log.date) { showToast('Enter date'); return; }
+            appData.sleepLogs.push(log);
+            saveData();
+            renderSleep();
+            document.getElementById('sleepDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('sleepStart').value = '';
+            document.getElementById('sleepEnd').value = '';
+            document.getElementById('sleepNotes').value = '';
+            showToast('✓ Sleep logged');
+        }
+
+        function renderSleep() {
+            const container = document.getElementById('sleepContainer');
+            if (!appData.sleepLogs.length) {
+                container.innerHTML = '<div class="empty-state">No sleep logs</div>';
+                return;
+            }
+            let html = '';
+            appData.sleepLogs.slice(-10).forEach(l => {
+                html += `<div class="card" style="border-left: 5px solid var(--primary);">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">📅 ${l.date}</div>
+                    <div style="font-size: 0.9rem; color: var(--text-light);">⏰ ${l.start} - ${l.end}</div>
+                    ${l.notes ? `<div style="font-size: 0.85rem; color: var(--text-dark); margin-top: 0.5rem;">${l.notes}</div>` : ''}
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // SYMPTOMS
+        function addSymptom() {
+            const sym = {
+                id: Date.now(),
+                name: document.getElementById('symName').value,
+                severity: parseInt(document.getElementById('symSeverity').value) || 0,
+                date: document.getElementById('symDate').value,
+                relief: document.getElementById('symRelief').value
+            };
+            if (!sym.name || !sym.date) { showToast('Enter symptom & date'); return; }
+            appData.symptoms.push(sym);
+            saveData();
+            renderSymptoms();
+            document.getElementById('symName').value = '';
+            document.getElementById('symSeverity').value = '';
+            document.getElementById('symDate').value = '';
+            document.getElementById('symRelief').value = '';
+            showToast('✓ Symptom logged');
+        }
+
+        function renderSymptoms() {
+            const container = document.getElementById('symptomsContainer');
+            if (!appData.symptoms.length) {
+                container.innerHTML = '<div class="empty-state">No symptoms</div>';
+                return;
+            }
+            let html = '';
+            appData.symptoms.slice(-10).forEach(s => {
+                html += `<div class="card" style="border-left: 5px solid var(--primary);">
+                    <div style="font-weight: 700;">${s.name}</div>
+                    <div style="font-size: 0.9rem; color: var(--text-light);">📅 ${s.date} • Severity: ${s.severity}/10</div>
+                    ${s.relief ? `<div style="font-size: 0.85rem; margin-top: 0.5rem;">✓ Relief: ${s.relief}</div>` : ''}
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // PHOTOS
+        function uploadGalleryPhotos() {
+            const files = document.getElementById('galleryPhotos').files;
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    appData.gallery.push({ id: Date.now(), image: e.target.result });
+                    saveData();
+                    renderGallery();
+                };
+                reader.readAsDataURL(file);
+            });
+            showToast('✓ Photos added');
+        }
+
+        function renderGallery() {
+            const container = document.getElementById('galleryContainer');
+            if (!appData.gallery.length) {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-light);">No photos</p>';
+                return;
+            }
+            let html = '';
+            appData.gallery.forEach(p => {
+                html += `<div class="gallery-item" onclick="openGalleryModal('${p.id}')"><img src="${p.image}"></div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function openGalleryModal(id) {
+            const photo = appData.gallery.find(p => p.id == id);
+            if (photo) {
+                document.getElementById('galleryModalImg').src = photo.image;
+                document.getElementById('galleryModal').classList.add('show');
+            }
+        }
+
+        function closeGalleryModal() {
+            document.getElementById('galleryModal').classList.remove('show');
+        }
+
+        // BIRTH STORY
+        function saveBirthStory() {
+            appData.birthStory = {
+                date: document.getElementById('storyDate').value,
+                time: document.getElementById('storyTime').value,
+                weight: document.getElementById('storyWeight').value,
+                length: document.getElementById('storyLength').value,
+                narrative: document.getElementById('storyNarrative').value
+            };
+            saveData();
+            renderBirthStory();
+            showToast('✓ Story saved');
+        }
+
+        function renderBirthStory() {
+            const container = document.getElementById('storyContainer');
+            if (!appData.birthStory.narrative) {
+                container.innerHTML = '';
+                return;
+            }
+            let html = `<div class="card" style="border-left: 5px solid var(--primary);">
+                <h3 style="margin: 0 0 1rem 0;">Your Birth Story</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div><strong>Date:</strong> ${appData.birthStory.date}</div>
+                    <div><strong>Time:</strong> ${appData.birthStory.time}</div>
+                    <div><strong>Weight:</strong> ${appData.birthStory.weight} lbs</div>
+                    <div><strong>Length:</strong> ${appData.birthStory.length} in</div>
+                </div>
+                <div style="margin-top: 1rem; white-space: pre-wrap; line-height: 1.8;">${appData.birthStory.narrative}</div>
+            </div>`;
+            container.innerHTML = html;
+        }
+
+        // FEEDING
+        function addFeedingLog() {
+            const log = {
+                id: Date.now(),
+                date: document.getElementById('feedDate').value,
+                time: document.getElementById('feedTime').value,
+                type: document.getElementById('feedType').value
+            };
+            if (!log.date || !log.type) { showToast('Enter date & type'); return; }
+            appData.feedingLogs.push(log);
+            saveData();
+            renderFeeding();
+            showToast('✓ Logged');
+        }
+
+        function renderFeeding() {
+            const container = document.getElementById('feedingContainer');
+            if (!appData.feedingLogs.length) {
+                container.innerHTML = '';
+                return;
+            }
+            let html = '<table><thead><tr><th>Date</th><th>Time</th><th>Type</th><th>Action</th></tr></thead><tbody>';
+            appData.feedingLogs.slice(-10).forEach(l => {
+                html += `<tr><td>${l.date}</td><td>${l.time}</td><td>${l.type}</td><td><button class="btn-small btn-delete" onclick="deleteFeeding('${l.id}')">✕</button></td></tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function deleteFeeding(id) {
+            appData.feedingLogs = appData.feedingLogs.filter(f => f.id != id);
+            saveData();
+            renderFeeding();
+        }
+
+        // PARTNER
+        function savePartnerMsg() {
+            const msg = {
+                id: Date.now(),
+                message: document.getElementById('partnerMsg').value,
+                date: new Date().toLocaleDateString()
+            };
+            if (!msg.message) { showToast('Enter message'); return; }
+            appData.partnerMessages.push(msg);
+            saveData();
+            renderPartnerMessages();
+            document.getElementById('partnerMsg').value = '';
+            showToast('✓ Message saved');
+        }
+
+        function renderPartnerMessages() {
+            const container = document.getElementById('partnerMessagesContainer');
+            if (!appData.partnerMessages.length) return;
+            let html = '';
+            appData.partnerMessages.forEach(m => {
+                html += `<div class="card" style="border-left: 5px solid var(--primary);">
+                    <div style="color: var(--text-dark); margin-bottom: 0.8rem; white-space: pre-wrap;">${m.message}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-light);">📅 ${m.date}</div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function exportForPartner() {
+            const json = JSON.stringify(appData, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `mama-journey-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            showToast('✓ Exported for partner');
+        }
+
+        // DASHBOARD
+        function updateDashboard() {
+            const stats = document.getElementById('dashboardStats');
+            if (!stats) return;
+            stats.innerHTML = `
+                <div class="stat-card"><div class="stat-value">${appData.journals.length}</div><div class="stat-label">Journal Entries</div></div>
+                <div class="stat-card"><div class="stat-value">${appData.voiceMemos.length}</div><div class="stat-label">Voice Memos</div></div>
+                <div class="stat-card"><div class="stat-value">${appData.tracking.length}</div><div class="stat-label">Health Logs</div></div>
+                <div class="stat-card"><div class="stat-value">${appData.gallery.length}</div><div class="stat-label">Photos</div></div>
+            `;
+            document.getElementById('dailyAffirmation').textContent = `"${affirmations[Math.floor(Math.random() * affirmations.length)]}"`;
+        }
+
+        // DATA MANAGEMENT
+        function exportData() {
+            const json = JSON.stringify(appData, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `mama-journey-backup-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            showToast('✓ Backed up!');
+        }
+
+        function importData() {
+            document.getElementById('importFile').click();
+        }
+
+        function importFromFile() {
+            const file = document.getElementById('importFile').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        appData = JSON.parse(e.target.result);
+                        localStorage.setItem(APP_KEY, JSON.stringify(appData));
+                        loadData();
+                        showToast('✓ Imported!');
+                    } catch { showToast('Error importing'); }
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ Delete ALL data? This cannot be undone.')) {
+                appData = initializeData();
+                localStorage.removeItem(APP_KEY);
+                location.reload();
+            }
+        }
+
+        function renderAll() {
+            renderJournal();
+            renderVoiceMemos();
+            renderTracking();
+            renderMoodPlants();
+            renderAffirmations();
+            renderRecipes();
+            renderLabResults();
+            renderExpenses();
+            renderRegistry();
+            renderSleep();
+            renderSymptoms();
+            renderGallery();
+            renderBirthStory();
+            renderFeeding();
+            renderPartnerMessages();
+        }
+
+        function init() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('entryDate').value = today;
+            document.getElementById('trackDate').value = today;
+            document.getElementById('sleepDate').value = today;
+            document.getElementById('symDate').value = today;
+            document.getElementById('storyDate').value = today;
+            document.getElementById('feedDate').value = today;
+
+            const theme = localStorage.getItem('selectedTheme') || 'brown';
+            setTheme(theme);
+
+            loadData();
+            newAffirmation();
+            updateDashboard();
+            renderRecipes();
+        }
+
+        window.addEventListener('click', (e) => {
+            if (e.target.id === 'galleryModal') closeGalleryModal();
+        });
+
+        init();
+    </script>
+</body>
+</html>
